@@ -1,0 +1,9 @@
+# AnNuMa Study Companion — dependencies
+#
+# Web app (app.py):
+flask>=3.0
+google-genai>=0.3          # intelligent mode (LLM-as-judge); optional at runtime
+python-dotenv>=1.0         # reads GEMINI_API_KEY from .env
+
+# MCP server (mcp_server.py):
+mcp>=1.0                   # requires Python 3.10+

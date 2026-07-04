@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AnNuMa Study Companion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!-- KaTeX: renders LaTeX math ($...$) as proper typeset formulas -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<style>
+  :root {
+    --bg:          #f5f8fd;
+    --surface:     #ffffff;
+    --ink:         #0f1b2d;
+    --ink-soft:    #5a6b82;
+    --ink-faint:   #93a1b5;
+    --line:        #e4ebf5;
+    --blue:        #1a73e8;
+    --blue-dark:   #1557b0;
+    --blue-soft:   #e8f0fe;
+    --blue-tint:   #f0f6ff;
+    --green:       #1e8e3e;
+    --green-soft:  #e6f4ea;
+    --amber:       #e37400;
+    --amber-soft:  #fef3e3;
+    --red:         #d93025;
+    --red-soft:    #fce8e6;
+    --streak:      #ff7a00;
+    --radius:      16px;
+    --radius-sm:   10px;
+    --shadow:      0 1px 2px rgba(15,27,45,0.04), 0 4px 16px rgba(15,27,45,0.06);
+    --shadow-lg:   0 4px 12px rgba(15,27,45,0.06), 0 12px 40px rgba(26,115,232,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+    font-size: 16px; line-height: 1.55; -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 0 24px; }
+
+  /* ---------- Top bar ---------- */
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 22px 0 20px;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand .logo {
+    width: 38px; height: 38px; border-radius: 11px;
+    background: linear-gradient(135deg, var(--blue), #4f9bff);
+    display: grid; place-items: center; color: #fff; font-weight: 800;
+    font-size: 17px; box-shadow: 0 4px 12px rgba(26,115,232,0.3);
+  }
+  .brand .name { font-weight: 700; font-size: 17px; letter-spacing: -0.01em; }
+  .brand .name span { color: var(--ink-faint); font-weight: 500; }
+
+  .top-stats { display: flex; align-items: center; gap: 10px; }
+  .stat-chip {
+    display: flex; align-items: center; gap: 7px; padding: 8px 14px;
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 100px; font-size: 14px; font-weight: 600; box-shadow: var(--shadow);
+  }
+  .stat-chip .ic { font-size: 15px; }
+  .stat-chip.streak .num { color: var(--streak); }
+  .stat-chip.xp .num { color: var(--blue); }
+  .stat-chip .lbl { color: var(--ink-faint); font-weight: 500; font-size: 12px; }
+
+  /* ---------- Hero ---------- */
+  .hero { padding: 18px 0 26px; }
+  .hero h1 {
+    font-size: clamp(28px, 4.4vw, 42px); font-weight: 800; letter-spacing: -0.025em;
+    line-height: 1.08;
+  }
+  .hero h1 .accent { color: var(--blue); }
+  .hero p { margin-top: 12px; color: var(--ink-soft); font-size: 16px; max-width: 60ch; }
+  .hero .badges { margin-top: 18px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .pill {
+    font-size: 12.5px; font-weight: 600; padding: 6px 12px; border-radius: 100px;
+    background: var(--surface); border: 1px solid var(--line); color: var(--ink-soft);
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .pill b { color: var(--ink); }
+  .pill.live { border-color: var(--green); color: var(--green); background: var(--green-soft); }
+  .pill.live .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); animation: pulse 1.8s infinite; }
+  .pill.static { border-color: var(--ink-faint); color: var(--ink-soft); }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.35;} }
+
+  /* ---------- Layout ---------- */
+  .layout { display: grid; grid-template-columns: 270px 1fr; gap: 28px; padding-bottom: 70px; align-items: start; }
+
+  /* ---------- Sidebar ---------- */
+  .side {
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 18px; position: sticky; top: 18px; box-shadow: var(--shadow);
+  }
+  .side h2 {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--ink-faint); margin-bottom: 6px; padding: 0 8px;
+  }
+  .overall-bar { margin: 10px 8px 16px; }
+  .overall-bar .track { height: 7px; background: var(--blue-soft); border-radius: 100px; overflow: hidden; }
+  .overall-bar .fill { height: 100%; background: linear-gradient(90deg, var(--blue), #4f9bff); border-radius: 100px; width: 0%; transition: width 0.5s cubic-bezier(0.2,0.7,0.2,1); }
+  .overall-bar .lbl { font-size: 11.5px; color: var(--ink-faint); margin-top: 7px; font-weight: 500; }
+  .review-btn {
+    width: 100%; margin: 0 0 14px; padding: 10px 12px; border-radius: var(--radius-sm);
+    border: 1.5px solid var(--amber); background: var(--amber-soft); color: var(--amber);
+    font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer;
+    display: flex; align-items: center; gap: 8px; transition: all 0.15s ease;
+  }
+  .review-btn:hover:not(:disabled) { background: var(--amber); color: #fff; }
+  .review-btn:disabled { opacity: 0.45; cursor: default; border-color: var(--line); background: var(--bg); color: var(--ink-faint); }
+  .review-btn .ic { font-size: 15px; }
+  .review-btn .rcount { margin-left: auto; background: rgba(255,255,255,0.6); padding: 1px 9px; border-radius: 100px; font-size: 12px; }
+  .review-btn:hover:not(:disabled) .rcount { background: rgba(255,255,255,0.25); }
+  .lec-group { margin-top: 8px; }
+  .lec-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.06em; color: var(--blue);
+    padding: 8px 8px 4px; display: flex; align-items: center; gap: 6px;
+  }
+  .lec-label .cnt { color: var(--ink-faint); font-weight: 500; margin-left: auto; }
+  .topic-btn {
+    width: 100%; text-align: left; background: none; border: none; cursor: pointer;
+    font-family: inherit; font-size: 14.5px; font-weight: 500; color: var(--ink);
+    padding: 9px 10px; border-radius: var(--radius-sm); transition: all 0.14s ease;
+    display: flex; align-items: center; gap: 9px;
+  }
+  .topic-btn:hover { background: var(--blue-tint); }
+  .topic-btn.active { background: var(--blue-soft); color: var(--blue-dark); font-weight: 600; }
+  .topic-btn .tick {
+    width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--line);
+    flex-shrink: 0; display: grid; place-items: center; font-size: 9px; color: transparent;
+  }
+  .topic-btn.done .tick { background: var(--green); border-color: var(--green); color: #fff; }
+  .topic-btn.review .tick { background: var(--amber); border-color: var(--amber); color: #fff; }
+
+  /* ---------- Main stage ---------- */
+  .stage { min-height: 460px; }
+
+  .qhead { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .qhead .pos { font-size: 13px; font-weight: 600; color: var(--ink-soft); }
+  .qhead .srctag {
+    font-size: 12px; font-weight: 700; color: var(--blue); background: var(--blue-soft);
+    padding: 4px 12px; border-radius: 100px;
+  }
+
+  .qcard {
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 30px 32px; box-shadow: var(--shadow-lg); position: relative; overflow: hidden;
+  }
+  .qcard::before {
+    content: ""; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+    background: linear-gradient(90deg, var(--blue), #4f9bff);
+  }
+  .qcard .klabel {
+    font-size: 11.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--ink-faint); margin-bottom: 16px;
+  }
+  .qcard .qtext { font-size: 23px; font-weight: 700; line-height: 1.32; letter-spacing: -0.02em; }
+  .qtext.loading { color: var(--ink-faint); font-weight: 600; font-size: 18px; display: flex; align-items: center; gap: 12px; }
+  .tdots { display: inline-flex; gap: 5px; }
+  .tdots i { width: 7px; height: 7px; border-radius: 50%; background: var(--blue); animation: bnc 1.2s infinite both; }
+  .tdots i:nth-child(1){animation-delay:-.24s;} .tdots i:nth-child(2){animation-delay:-.12s;}
+  @keyframes bnc { 0%,80%,100%{transform:scale(.5);opacity:.4;} 40%{transform:scale(1);opacity:1;} }
+
+  .ans-wrap { margin-top: 18px; }
+  .ans-wrap label { display: block; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 9px; }
+  textarea.ans {
+    width: 100%; min-height: 96px; resize: vertical; background: var(--surface);
+    border: 1.5px solid var(--line); border-radius: var(--radius-sm); padding: 14px 16px;
+    font-family: "JetBrains Mono", monospace; font-size: 14px; line-height: 1.6; color: var(--ink);
+    transition: all 0.15s ease;
+  }
+  textarea.ans:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 4px var(--blue-soft); }
+  textarea.ans::placeholder { color: var(--ink-faint); }
+  .hint { margin-top: 9px; font-size: 12px; color: var(--ink-faint); font-weight: 500; }
+  .hint.warn { color: var(--amber); }
+
+  .row { display: flex; gap: 10px; align-items: center; margin-top: 16px; flex-wrap: wrap; }
+  .btn {
+    font-family: inherit; font-size: 14px; font-weight: 700; padding: 12px 22px;
+    border-radius: var(--radius-sm); cursor: pointer; border: none; transition: all 0.15s ease;
+    background: var(--blue); color: #fff; box-shadow: 0 4px 12px rgba(26,115,232,0.25);
+  }
+  .btn:hover { background: var(--blue-dark); transform: translateY(-1px); box-shadow: 0 6px 16px rgba(26,115,232,0.32); }
+  .btn:active { transform: translateY(0); }
+  .btn:disabled { opacity: 0.55; cursor: wait; transform: none; }
+  .btn.ghost { background: var(--surface); color: var(--ink-soft); border: 1.5px solid var(--line); box-shadow: none; }
+  .btn.ghost:hover { background: var(--bg); color: var(--ink); transform: none; }
+  .btn.green { background: var(--green); box-shadow: 0 4px 12px rgba(30,142,62,0.25); }
+  .btn.green:hover { background: #166b2e; }
+  .btn.sm { padding: 10px 18px; font-size: 13px; }
+  .mini-score { margin-left: auto; display: flex; gap: 14px; font-size: 13px; font-weight: 600; }
+  .mini-score .k { color: var(--green); } .mini-score .r { color: var(--amber); }
+
+  /* ---------- Feedback ---------- */
+  .fb { margin-top: 18px; border-radius: var(--radius); padding: 22px 26px; display: none; border: 1px solid; }
+  .fb.show { display: block; animation: pop 0.35s cubic-bezier(0.2,0.8,0.2,1); }
+  @keyframes pop { from{opacity:0; transform:scale(0.97) translateY(8px);} to{opacity:1; transform:none;} }
+  .fb.correct { background: var(--green-soft); border-color: #a8d5b5; }
+  .fb.wrong { background: var(--red-soft); border-color: #f3b8b2; }
+  .fb.reveal { background: var(--blue-tint); border-color: #bcd6fb; }
+  .fb.busy { background: var(--amber-soft); border-color: #f5cf9a; }
+  .fb-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .verdict { font-size: 15px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+  .fb.correct .verdict { color: var(--green); }
+  .fb.wrong .verdict { color: var(--red); }
+  .fb.busy .verdict { color: var(--amber); }
+  .fb.reveal .verdict { color: var(--blue-dark); }
+  .score-chip { font-size: 13px; font-weight: 700; padding: 4px 12px; border-radius: 100px; background: rgba(255,255,255,0.7); }
+  .fb.correct .score-chip { color: var(--green); } .fb.wrong .score-chip { color: var(--red); }
+  .fb-text { font-size: 15.5px; line-height: 1.55; color: var(--ink); margin-bottom: 14px; }
+  .model { padding-top: 13px; border-top: 1px solid rgba(15,27,45,0.1); }
+  .model .ml { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-faint); display: block; margin-bottom: 7px; }
+  .model .mt { font-size: 15px; line-height: 1.55; color: var(--ink); }
+  .next-row { margin-top: 18px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .streak-pop { font-size: 13px; font-weight: 700; color: var(--streak); display: flex; align-items: center; gap: 5px; }
+
+  /* ---------- Empty / start / summary ---------- */
+  .panel {
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 56px 40px; text-align: center; box-shadow: var(--shadow);
+  }
+  .panel .emoji { font-size: 40px; margin-bottom: 14px; }
+  .panel h3 { font-size: 24px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 8px; }
+  .panel p { color: var(--ink-soft); font-size: 15px; max-width: 44ch; margin: 0 auto; }
+  .summary-stats { margin: 24px auto 0; display: inline-flex; gap: 0; border: 1px solid var(--line); border-radius: var(--radius-sm); overflow: hidden; }
+  .summary-stats .cell { padding: 16px 26px; border-right: 1px solid var(--line); }
+  .summary-stats .cell:last-child { border-right: none; }
+  .summary-stats .cell .v { font-size: 26px; font-weight: 800; }
+  .summary-stats .cell .l { font-size: 12px; color: var(--ink-faint); font-weight: 600; margin-top: 2px; }
+  .summary-stats .cell.k .v { color: var(--green); }
+  .summary-stats .cell.r .v { color: var(--amber); }
+  .summary-stats .cell.p .v { color: var(--blue); }
+
+  footer { padding: 28px 0 50px; text-align: center; font-size: 12px; color: var(--ink-faint); font-weight: 500; line-height: 1.7; }
+  footer .arch { font-family: "JetBrains Mono", monospace; font-size: 11px; }
+
+  @media (max-width: 760px) {
+    .layout { grid-template-columns: 1fr; gap: 16px; }
+    .side { position: static; }
+    .top-stats { gap: 7px; }
+    .stat-chip { padding: 7px 11px; font-size: 13px; }
+    .qcard { padding: 24px; }
+    .qcard .qtext { font-size: 20px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="logo">A</div>
+      <div class="name">AnNuMa <span>· Study Companion</span></div>
+    </div>
+    <div class="top-stats">
+      <div class="stat-chip streak" title="Correct answers in a row">
+        <span class="ic">🔥</span><span class="num" id="streak-num">0</span>
+        <span class="lbl">streak</span>
+      </div>
+      <div class="stat-chip xp" title="Points earned">
+        <span class="ic">⚡</span><span class="num" id="xp-num">0</span>
+        <span class="lbl">XP</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero">
+    <h1>Master <span class="accent">AnNuMa</span>, one recall at a time.</h1>
+    <p>Answers are typed in plain words and checked by meaning against the verified lecture notes, never invented. Active recall, one topic at a time.</p>
+    <div class="badges">
+      <span class="pill"><b id="topic-count">–</b> topics</span>
+      <span class="pill">sources <b>V1 · V6</b></span>
+      <span class="pill">data <b>read-only</b></span>
+      <span class="pill" id="mode-pill"><span class="dot"></span><span id="mode-text">checking…</span></span>
+    </div>
+  </div>
+
+  <div class="layout">
+    <aside class="side">
+      <h2>Progress</h2>
+      <div class="overall-bar">
+        <div class="track"><div class="fill" id="overall-fill"></div></div>
+        <div class="lbl"><span id="overall-done">0</span> of <span id="overall-total">0</span> topics mastered</div>
+      </div>
+      <button class="review-btn" id="review-btn" onclick="startReview()">
+        <span class="ic">↻</span> Review weak topics <span class="rcount" id="review-count">0</span>
+      </button>
+      <div id="topic-nav"></div>
+    </aside>
+
+    <main class="stage">
+      <div id="card-area">
+        <div class="panel">
+          <div class="emoji">📘</div>
+          <h3>Pick a topic to start</h3>
+          <p>One question per sub-topic, drawn from the verified summaries. Answer from memory to build a streak.</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div>AnNuMa Study Companion — Capstone · Agents for Good</div>
+    <div class="arch">SQLite knowledge base · read-only guardrail (SELECT-only) · MCP agent + web surface · LLM-as-judge grounded in retrieved material</div>
+  </footer>
+</div>
+
+<script>
+  let topics = [];
+  let currentList = [];
+  let currentIndex = 0;
+  let intelligent = false;
+  let currentQuestion = "";
+  const seen = new Set();
+  const doneIds = new Set();    // answered correctly
+  const reviewIds = new Set();  // answered wrong / to review
+  let known = 0, review = 0;
+  let streak = 0, bestStreak = 0, xp = 0;
+  let reviewMode = false;  // true when the current session is a "weak topics" review
+
+  async function init() {
+    try { intelligent = (await (await fetch('/api/status')).json()).intelligent; }
+    catch (e) { intelligent = false; }
+    const pill = document.getElementById('mode-pill');
+    const txt = document.getElementById('mode-text');
+    if (intelligent) { txt.textContent = 'AI tutor: on'; pill.classList.add('live'); }
+    else { txt.textContent = 'static mode'; pill.classList.add('static'); }
+
+    topics = await (await fetch('/api/topics')).json();
+    document.getElementById('topic-count').textContent = topics.length;
+    document.getElementById('overall-total').textContent = topics.length;
+    renderNav();
+  }
+
+  function renderNav() {
+    const nav = document.getElementById('topic-nav');
+    let html = ''; let lastSrc = null; let groupItems = [];
+    // count per source
+    const counts = {};
+    topics.forEach(t => counts[t.source] = (counts[t.source]||0)+1);
+
+    topics.forEach(t => {
+      if (t.source !== lastSrc) {
+        html += `<div class="lec-group"><div class="lec-label">${t.source}<span class="cnt">${counts[t.source]}</span></div>`;
+        lastSrc = t.source;
+      }
+      let cls = '';
+      if (doneIds.has(t.id)) cls = 'done';
+      else if (reviewIds.has(t.id)) cls = 'review';
+      const mark = doneIds.has(t.id) ? '✓' : (reviewIds.has(t.id) ? '↻' : '');
+      html += `<button class="topic-btn ${cls}" data-id="${t.id}" onclick="startTopic(${t.id})">
+        <span class="tick">${mark}</span>${escapeHtml(t.topic)}</button>`;
+    });
+    html += '</div>';
+    nav.innerHTML = html;
+    updateOverall();
+  }
+
+  function updateOverall() {
+    const done = doneIds.size;
+    const pct = topics.length ? Math.round(done/topics.length*100) : 0;
+    document.getElementById('overall-fill').style.width = pct + '%';
+    document.getElementById('overall-done').textContent = done;
+    // keep the "Review weak topics" button in sync
+    const rc = reviewIds.size;
+    const rcEl = document.getElementById('review-count');
+    const rbEl = document.getElementById('review-btn');
+    if (rcEl) rcEl.textContent = rc;
+    if (rbEl) rbEl.disabled = rc === 0;
+  }
+  function setActive(id) {
+    document.querySelectorAll('.topic-btn').forEach(b => b.classList.toggle('active', Number(b.dataset.id) === id));
+  }
+
+  function startTopic(id) {
+    const pos = topics.findIndex(t => t.id === id);
+    currentList = topics.slice(pos).map(t => t.id);
+    currentIndex = 0;
+    reviewMode = false;
+    showQuestion();
+  }
+
+  // Build a session from ONLY the topics currently marked "to review".
+  // Ordered by lecture so it still feels structured.
+  function startReview() {
+    if (reviewIds.size === 0) return;
+    currentList = topics.filter(t => reviewIds.has(t.id)).map(t => t.id);
+    currentIndex = 0;
+    reviewMode = true;
+    showQuestion();
+  }
+
+  async function showQuestion() {
+    const id = currentList[currentIndex];
+    setActive(id);
+    const area = document.getElementById('card-area');
+    area.innerHTML = `
+      <div class="qhead"><span class="pos">Question ${currentIndex+1} / ${currentList.length}</span><span class="srctag">…</span></div>
+      <div class="qcard"><div class="klabel">loading</div>
+        <div class="qtext loading">${intelligent ? 'Writing a question from the material' : 'Loading question'} <span class="tdots"><i></i><i></i><i></i></span></div>
+      </div>`;
+
+    let card;
+    try { card = await (await fetch('/api/question/'+id)).json(); }
+    catch(e) { area.innerHTML = `<div class="panel"><div class="emoji">⚠️</div><h3>Connection lost</h3><p>Is the app still running in the terminal?</p></div>`; return; }
+
+    currentQuestion = card.question;
+    const busy = card.busy;
+    const hint = busy
+      ? `<div class="hint warn">${escapeHtml(busyMessage(card, true))}</div>`
+      : `<div class="hint">${intelligent ? 'Checked by meaning · notation can be informal · ⌘/Ctrl+Enter to submit' : 'Static mode — submit to reveal the reference answer.'}</div>`;
+
+    area.innerHTML = `
+      <div class="qhead"><span class="pos">Question ${currentIndex+1} / ${currentList.length}</span><span class="srctag">${card.source}</span></div>
+      <div class="qcard">
+        <div class="klabel">${card.source} · ${escapeHtml(card.topic)}</div>
+        <div class="qtext">${escapeHtml(card.question)}</div>
+      </div>
+      <div class="ans-wrap">
+        <label for="ans">Answer</label>
+        <textarea id="ans" class="ans" placeholder="Type what you remember… (math like x^2, sqrt(x), (a+b)/c, |x| < 1)"></textarea>
+        ${hint}
+      </div>
+      <div class="row">
+        <button class="btn" id="submit-btn" onclick="submitAnswer()">${intelligent && !busy ? 'Check answer' : 'Reveal answer'}</button>
+        <button class="btn ghost" onclick="nextQuestion()">Skip</button>
+        <div class="mini-score"><span class="k">${known} known</span><span class="r">${review} review</span></div>
+      </div>
+      <div class="fb" id="fb"></div>`;
+
+    const ta = document.getElementById('ans');
+    ta.focus();
+    ta.addEventListener('keydown', e => { if ((e.metaKey||e.ctrlKey) && e.code==='Enter'){ e.preventDefault(); submitAnswer(); } });
+    renderMath();  // typeset any $...$ math in the question
+  }
+
+  async function submitAnswer() {
+    const id = currentList[currentIndex];
+    const answer = document.getElementById('ans').value.trim();
+    const btn = document.getElementById('submit-btn');
+    if (intelligent && !answer) { document.getElementById('ans').focus(); return; }
+    btn.disabled = true; btn.textContent = intelligent ? 'Checking…' : 'Revealing…';
+    let res;
+    try {
+      res = await (await fetch('/api/check', { method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ id, answer, question: currentQuestion }) })).json();
+    } catch(e) { btn.disabled=false; btn.textContent='Check answer'; return; }
+    renderFeedback(res, id);
+  }
+
+  function renderFeedback(res, id) {
+    const fb = document.getElementById('fb');
+    fb.className = 'fb show';
+
+    // The submit button has done its job; disable it so it never sits on
+    // "Checking…". The user moves on via the Next / self-assess buttons.
+    const submitBtn = document.getElementById('submit-btn');
+    if (submitBtn) { submitBtn.style.display = 'none'; }
+
+    if (res.busy) {
+      fb.classList.add('busy');
+      fb.innerHTML = `<div class="fb-top"><div class="verdict">⏳ AI tutor busy</div></div>
+        <div class="fb-text">${escapeHtml(busyMessage(res, false))}</div>
+        <div class="model"><span class="ml">From the summary</span><div class="mt">${escapeHtml(res.model_answer||'')}</div></div>
+        <div class="next-row"><button class="btn green sm" onclick="selfMark(true,${id})">I knew it ✓</button>
+        <button class="btn ghost sm" onclick="selfMark(false,${id})">Review again</button></div>`;
+      renderMath();
+      return;
+    }
+
+    let verdict, chip = '', streakHtml = '';
+    if (res.correct === true) {
+      fb.classList.add('correct');
+      streak++; bestStreak = Math.max(bestStreak, streak);
+      const gain = 10 + Math.min(streak-1, 5) * 2;  // streak bonus
+      xp += gain;
+      verdict = '✓ Correct';
+      streakHtml = streak >= 2 ? `<span class="streak-pop">🔥 ${streak} in a row · +${gain} XP</span>` : `<span class="streak-pop">+${gain} XP</span>`;
+      if (!seen.has(id)) { seen.add(id); known++; }
+      doneIds.add(id); reviewIds.delete(id);
+    } else if (res.correct === false) {
+      fb.classList.add('wrong');
+      streak = 0;
+      verdict = '✗ Not quite';
+      if (!seen.has(id)) { seen.add(id); review++; }
+      reviewIds.add(id); doneIds.delete(id);
+    } else {
+      fb.classList.add('reveal');
+      verdict = '◆ Reference answer';
+    }
+    if (typeof res.score === 'number') chip = `<span class="score-chip">${res.score}/100</span>`;
+
+    let html = `<div class="fb-top"><div class="verdict">${verdict} ${streakHtml}</div>${chip}</div>`;
+    if (res.feedback) html += `<div class="fb-text">${escapeHtml(res.feedback)}</div>`;
+    if (res.model_answer) html += `<div class="model"><span class="ml">From the summary</span><div class="mt">${escapeHtml(res.model_answer)}</div></div>`;
+
+    if (res.correct === null) {
+      html += `<div class="next-row"><button class="btn green sm" onclick="selfMark(true,${id})">I knew it ✓</button>
+        <button class="btn ghost sm" onclick="selfMark(false,${id})">Review again</button></div>`;
+    } else {
+      html += `<div class="next-row"><button class="btn sm" id="next-btn" onclick="nextQuestion()">Next question →</button></div>`;
+    }
+    fb.innerHTML = html;
+    refreshStats();
+    renderNav(); setActive(id);
+
+    // move focus to the Next button so Enter continues the session
+    const nb = document.getElementById('next-btn');
+    if (nb) nb.focus();
+    renderMath();  // typeset any $...$ math in the feedback / model answer
+  }
+
+  function selfMark(correct, id) {
+    if (!seen.has(id)) { seen.add(id); if (correct) known++; else review++; }
+    if (correct) { doneIds.add(id); reviewIds.delete(id); xp += 5; }
+    else { reviewIds.add(id); doneIds.delete(id); streak = 0; }
+    refreshStats();
+    nextQuestion();
+  }
+
+  function refreshStats() {
+    document.getElementById('streak-num').textContent = streak;
+    document.getElementById('xp-num').textContent = xp;
+    document.querySelectorAll('.mini-score .k').forEach(e=>e.textContent = known+' known');
+    document.querySelectorAll('.mini-score .r').forEach(e=>e.textContent = review+' review');
+    updateOverall();  // keep progress bar + review-button count in sync
+  }
+
+  function nextQuestion() {
+    if (currentIndex < currentList.length-1) { currentIndex++; showQuestion(); }
+    else showSummary();
+  }
+
+  function showSummary() {
+    const total = known + review;
+    const pct = total ? Math.round(known/total*100) : 0;
+    const wasReview = reviewMode;
+    reviewMode = false;  // reset for the next session
+
+    const remaining = reviewIds.size;
+    let heading, sub;
+    if (wasReview) {
+      heading = remaining === 0 ? 'All caught up!' : 'Review round done';
+      sub = remaining === 0
+        ? 'You cleared every weak topic. Nice work.'
+        : `${remaining} topic${remaining === 1 ? '' : 's'} still need${remaining === 1 ? 's' : ''} another pass — run the review again anytime.`;
+    } else {
+      heading = 'Session complete';
+      sub = pct >= 70 ? 'Strong recall — keep it up!' : 'Good work. Revisit the weak topics to lock them in.';
+    }
+
+    document.getElementById('card-area').innerHTML = `
+      <div class="panel">
+        <div class="emoji">${(wasReview ? remaining === 0 : pct >= 70) ? '🎉' : '💪'}</div>
+        <h3>${heading}</h3>
+        <p>${sub}</p>
+        <div class="summary-stats">
+          <div class="cell k"><div class="v">${known}</div><div class="l">known</div></div>
+          <div class="cell r"><div class="v">${review}</div><div class="l">to review</div></div>
+          <div class="cell p"><div class="v">${pct}%</div><div class="l">recall</div></div>
+          <div class="cell"><div class="v">${bestStreak}🔥</div><div class="l">best streak</div></div>
+        </div>
+        <p style="margin-top:22px">Pick another topic on the left, or review the weak ones, to keep going.</p>
+      </div>`;
+    setActive(-1); renderNav();
+  }
+
+  function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+  // Build a clear "busy" message. Distinguishes an exhausted daily quota
+  // (waiting won't help) from a short per-minute limit or a server overload.
+  function busyMessage(res, short) {
+    // Daily free quota used up — waiting during this session won't help.
+    if (res.reason === 'daily') {
+      return short
+        ? "The free AI daily quota is used up — showing stored questions. It resets tomorrow; static self-check works until then."
+        : "The free AI daily quota is used up (it resets the next day). The app is now in self-check mode — here is the reference answer.";
+    }
+
+    const secs = (typeof res.retry_seconds === 'number' && res.retry_seconds > 0 && res.retry_seconds <= 120)
+      ? res.retry_seconds : null;
+    // Phrase it as an estimate, not a live countdown, since each retry may
+    // report a fresh number.
+    const wait = secs ? ` Give it roughly ${secs}s, then retry.` : ' Give it a moment, then retry.';
+
+    if (res.reason === 'overload') {
+      return short
+        ? `The AI tutor is briefly overloaded — showing a stored question.${wait}`
+        : `Gemini is experiencing high demand right now.${wait} Here is the reference answer to self-check.`;
+    }
+    // default: short per-minute rate limit
+    return short
+      ? `The free per-minute AI limit was hit — showing a stored question.${wait}`
+      : `The free per-minute AI limit was hit.${wait} Here is the reference answer to self-check.`;
+  }
+
+  // Render any LaTeX math ($...$ or $$...$$) inside the card area using KaTeX.
+  // Called after new question / feedback content is placed in the DOM.
+  // If KaTeX has not finished loading yet, retry shortly so the first
+  // question still gets typeset once the CDN scripts are ready.
+  function renderMath(retries = 10) {
+    const area = document.getElementById('card-area');
+    if (!area) return;
+    if (typeof renderMathInElement !== 'function') {
+      if (retries > 0) setTimeout(() => renderMath(retries - 1), 150);
+      return;
+    }
+    try {
+      renderMathInElement(area, {
+        delimiters: [
+          { left: '$$', right: '$$', display: true },
+          { left: '$', right: '$', display: false },
+          { left: '\\(', right: '\\)', display: false },
+          { left: '\\[', right: '\\]', display: true },
+        ],
+        throwOnError: false,   // malformed formula -> shown as-is, no crash
+        ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+      });
+    } catch (e) { /* harmless */ }
+  }
+
+  init();
+</script>
+</body>
+</html>
