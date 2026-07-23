@@ -103,8 +103,8 @@ annuma-study-companion/
 Clone, create a virtual environment, and build the knowledge base:
 
 ```bash
-git clone https://github.com/AlirezaFakari/annuma-study-companion.git annuma-companion
-cd annuma-companion
+git clone https://github.com/AlirezaFakari/annuma-study-companion.git
+cd annuma-study-companion
 
 python3 -m venv venv
 source venv/bin/activate          # Windows: venv\Scripts\activate
