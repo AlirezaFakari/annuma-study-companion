@@ -88,7 +88,11 @@ annuma-study-companion/
 │       ├── SKILL.md      # the Active Recall agent skill
 │       └── scripts/
 │           └── format_flashcard.py
-└── spec.md              # spec-first design document (Gherkin scenarios)
+├── spec.md              # spec-first design document (Gherkin scenarios)
+├── requirements.txt     # Python dependencies
+├── .gitignore           # keeps .env (the API key) out of git
+├── writeup.md           # capstone writeup
+└── Cover.png            # submission cover image
 ```
 
 ---
@@ -166,8 +170,8 @@ interpreter inside your virtualenv:
 {
   "mcpServers": {
     "annuma-study-companion": {
-      "command": "/absolute/path/to/annuma-companion/venv/bin/python",
-      "args": ["/absolute/path/to/annuma-companion/mcp_server.py"]
+      "command": "/absolute/path/to/annuma-study-companion/venv/bin/python",
+      "args": ["/absolute/path/to/annuma-study-companion/mcp_server.py"]
     }
   }
 }
@@ -220,7 +224,7 @@ To rebuild or extend it, edit `build_db.py` and re-run `python build_db.py`.
 
 - **Self-contained data.** SQLite was chosen over a live notes connection so
   the project is fully reproducible by a reviewer, with no external accounts.
-- **Spec-first.** `spec.md` describes the problem, the three concepts, and
+- **Spec-first.** `spec.md` describes the problem, the core concepts, and
   four Given/When/Then scenarios that the implementation follows.
 - **Grounding above all.** Every question and judgement is based only on
   retrieved content. If the knowledge base lacks something, the agent says so

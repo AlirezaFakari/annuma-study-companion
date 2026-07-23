@@ -17,7 +17,7 @@ Dual mode (so a reviewer is never blocked):
   - missing / failing   -> graceful fallback to static flashcards
 
 Robust error handling:
-  - Quota/rate-limit (HTTP 429) is detected and reported cleanly to the
+  - Rate limits (HTTP 429, incl. the daily quota) and overload (HTTP 503) are detected and reported cleanly to the
     frontend as a 'busy' state, instead of leaving the UI stuck.
 """
 
@@ -107,7 +107,7 @@ def _raise_if_busy(err: Exception):
     if not (is_quota or is_overload):
         return
 
-    # A per-day quota is exhausted -> waitin won't help until it resets.
+    # A per-day quota is exhausted -> waiting won't help until it resets.
     if is_quota and ("perday" in low.replace(" ", "") or "per day" in low
                      or "requestsperday" in low.replace(" ", "")):
         raise TutorBusyError("daily", None)
