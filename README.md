@@ -76,7 +76,7 @@ knowledge base is accessed.
 ## Repository layout
 
 ```
-annuma-companion/
+annuma-study-companion/
 ├── build_db.py          # builds knowledge.db (55 sub-topics, V1–V19)
 ├── knowledge.db         # the prebuilt SQLite knowledge base
 ├── mcp_server.py        # MCP server: list_topics + query_annuma (read-only)
