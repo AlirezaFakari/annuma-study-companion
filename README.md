@@ -1,4 +1,5 @@
 # AnNuMa Study Companion
+![AnNuMa Study Companion](Cover.png)
 
 An AI study agent that quizzes a student on **AnNuMa** (Analysis und
 Numerische Mathematik) using **active recall**, drawing every question from
