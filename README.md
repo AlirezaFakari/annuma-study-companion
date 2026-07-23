@@ -102,7 +102,7 @@ annuma-companion/
 Clone, create a virtual environment, and build the knowledge base:
 
 ```bash
-git clone <your-repo-url> annuma-companion
+git clone https://github.com/AlirezaFakari/annuma-study-companion.git annuma-companion
 cd annuma-companion
 
 python3 -m venv venv
